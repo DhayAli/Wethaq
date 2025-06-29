@@ -10,6 +10,8 @@ Built using Django
 - Django
 - HTML, CSS, JavaScript
 - SQLite
+  
+
 
 1 Clone the repository  
    ```bash
