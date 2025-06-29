@@ -15,8 +15,7 @@ Built using Django
 1 Clone the repository  
    ```bash
    git clone https://github.com/DhayAli/Wethaq.git
-   
-2 Navigate to the project directory
+   2 Navigate to the project directory
      cd Wethaq
 
 3 (Optional) Create and activate the virtual environment
