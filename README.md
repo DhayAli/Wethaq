@@ -12,7 +12,6 @@ Built using Django
 - SQLite
   
 
-
 1 Clone the repository  
    ```bash
    git clone https://github.com/DhayAli/Wethaq.git
