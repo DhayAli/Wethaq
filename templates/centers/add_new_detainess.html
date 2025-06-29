@@ -1,0 +1,374 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة موقوف</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+            background-color: #edf3f5;
+            padding: 0; /* إزالة الحواف العلوية */
+        }
+
+        .container {
+            width: 60%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 100px; /* إزاحة للأسفل لتجنب التداخل مع شريط الأدوات */
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* التأكد من أن الحواف والحشوات تشمل العرض الكامل */
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #352872;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #352872;
+        }
+
+        .back-home-btn:hover {
+            background-color: #d7d6dd;
+        }
+
+        .back-home-btn {
+            display: inline-block;
+            padding: 4px 8px; /* تقليل حجم المربع المحيط بالسهم */
+            color: white; /* تغيير لون السهم إلى الأبيض */
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.5rem;
+            text-align: center;
+            position: fixed;
+            top: 15px; /* تغيير الموضع ليكون فوق شريط الأدوات */
+            left: 20px;
+            cursor: pointer;
+            z-index: 1001; /* أعلى من شريط الأدوات */
+        }
+
+        /* شريط الأدوات */
+        .toolbar {
+            background-color: #352872;
+            padding: 35px; /* تكبير شريط الأدوات */
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+        footer {
+            background-color: #352872;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        .wethaq-logo {
+    position: absolute;
+    top: -7px;
+    right: 20px;
+    height: 90px;
+    width: auto;
+    transition: transform 0.3s ease;
+    z-index: 1002; /* أعلى من شريط الأدوات */
+}
+.wethaq-logo:hover {
+    transform: scale(1.1);
+}
+    </style>
+</head>
+<body>
+    <header>
+     
+       <a href= "{% url 'center_dashboard' %}">
+        <img src="{% static 'images/WethaqLogo.png' %}" class="wethaq-logo" alt="شعار وثاق">
+    </a>
+    </header>
+    <!-- شريط الأدوات -->
+    <div class="toolbar"></div>
+    <a href="{% url 'center_dashboard' %}" class="back-home-btn">⬅</a>
+
+    <div class="container">
+        <h2>إضافة موقوف</h2>
+        <div class="input-group">
+            <label for="name">الاسم</label>
+            <input type="text" id="name" placeholder="أدخل الاسم">
+            <small id="name-error" class="error"></small>
+        </div>
+        <div class="input-group">
+            <label for="nationality">الجنسية</label>
+            <input type="text" id="nationality" placeholder="أدخل الجنسية">
+            <small id="nationality-error" class="error"></small>
+        </div>
+        <div class="input-group">
+            <label for="id_type">نوع الهوية</label>
+            <select id="id_type">
+                <option value="civil_registry">السجل المدني</option>
+                <option value="resident_id">هوية مقيم</option>
+                <option value="violator_refugee_id">هوية مخالف لاجئ</option>
+                <option value="replacement_card">بطاقة بديلة</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="id_number">رقم الهوية</label>
+            <input type="text" id="id_number" placeholder="أدخل رقم الهوية" oninput="checkIdentity()">
+            <small id="id_number-error" class="error"></small>
+        </div>
+        <div class="input-group">
+            <label for="date_of_birth">تاريخ الميلاد</label>
+            <input type="date" id="date_of_birth" oninput="validateBirthdate()">
+            <small id="date_of_birth-error" class="error"></small>
+        </div>
+        <div class="input-group">
+            <label for="address">العنوان</label>
+            <input type="text" id="address" placeholder="أدخل العنوان">
+            <small id="address-error" class="error"></small>
+        </div>
+        <button class="btn" onclick="addDetainee()">إضافة موقوف</button>
+    </div>
+    <footer>
+        جميع الحقوق محفوظة © وثاق 2024
+    </footer>
+    <script>
+        function checkIdentity() {
+            const identity = document.getElementById("id_number").value.trim();
+            const identityError = document.getElementById("id_number-error");
+    
+            // تحقق من أن الرقم يتكون من 10 أرقام فقط
+            if (!/^[0-9]{10}$/.test(identity)) {
+                identityError.textContent = "رقم الهوية يجب أن يكون 10 أرقام صحيحة.";
+                return false;
+            } else {
+                identityError.textContent = "";
+                return true;
+            }
+        }
+    
+        function validateField(input, regex, errorMessage) {
+            const errorElement = document.getElementById(`${input.id}-error`);
+            if (!input.value.trim()) {
+                errorElement.textContent = "هذا الحقل مطلوب.";
+                return false;
+            } else if (!regex.test(input.value)) {
+                errorElement.textContent = errorMessage;
+                return false;
+            } else {
+                errorElement.textContent = "";
+                return true;
+            }
+        }
+
+        function validateName() {
+            return validateField(
+                document.getElementById("name"),
+                /^[\u0621-\u064A\s]+$/,
+                "الاسم يجب أن يحتوي على أحرف عربية فقط بدون أرقام أو علامات."
+            );
+        }
+
+        function validateNationality() {
+            return validateField(
+                document.getElementById("nationality"),
+                /^[\u0621-\u064A\s]+$/,
+                "الجنسية يجب أن تحتوي على أحرف عربية فقط بدون أرقام أو علامات."
+            );
+        }
+
+        function validateAddress() {
+            return validateField(
+                document.getElementById("address"),
+                /^[\u0621-\u064A\s]+$/,
+                "العنوان يجب أن يحتوي على أحرف عربية فقط بدون أرقام أو علامات."
+            );
+        }
+    
+        function validateBirthdate() {
+            const birthdateInput = document.getElementById("date_of_birth");
+            const birthdateError = document.getElementById("date_of_birth-error");
+            const birthdate = new Date(birthdateInput.value);
+            const today = new Date();
+    
+            if (!birthdateInput.value) {
+                birthdateError.textContent = "هذا الحقل مطلوب.";
+                return false;
+            } else if (birthdate > today) {
+                birthdateError.textContent = "تاريخ الميلاد لا يمكن أن يكون في المستقبل.";
+                return false;
+            } else {
+                birthdateError.textContent = "";
+                return true;
+            }
+        }
+
+        function checkIdentityExists(id_number) {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("❌ لم يتم العثور على توكن، يرجى تسجيل الدخول!");
+                return Promise.reject("No token found");
+            }
+
+            return fetch(`https://wethaq-backend.vercel.app/api/detainees/`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Token ${token}`
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(data.detail || "Failed to check identity");
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // تحقق من وجود رقم الهوية في البيانات
+                const exists = data.some(detainee => detainee.id_number === id_number);
+                return { exists };
+            });
+        }
+    
+        function addDetainee() {
+            let valid = true;
+
+            // التحقق من صحة الاسم
+            valid &&= validateName();
+    
+            // التحقق من صحة الجنسية
+            valid &&= validateNationality();
+    
+            // التحقق من صحة العنوان
+            valid &&= validateAddress();
+    
+            // التحقق من صحة رقم الهوية
+            valid &&= checkIdentity();
+    
+            // التحقق من تاريخ الميلاد
+            valid &&= validateBirthdate();
+    
+            // إذا كانت البيانات غير صحيحة، إظهار رسالة خطأ
+            if (!valid) {
+                alert("البيانات خاطئة. يرجى مراجعتها.");
+                return;
+            }
+
+            const id_number = document.getElementById("id_number").value;
+            const id_type = document.getElementById("id_type").value;
+            const nationality = document.getElementById("nationality").value;
+
+            // التحقق من شروط السجل المدني والجنسية السعودية
+            if (id_type === "civil_registry" && nationality !== "سعودي") {
+                alert("❌ يجب أن تكون الجنسية سعودية إذا كان نوع الهوية هو السجل المدني.");
+                return;
+            }
+    
+            // التحقق مما إذا كان رقم الهوية موجودًا مسبقًا
+            checkIdentityExists(id_number)
+                .then(data => {
+                    if (data.exists) {
+                        alert("❌ الرقم المدخل موجود بالفعل في النظام. الرجاء إدخال رقم هوية مختلف.");
+                        return;
+                    }
+
+                    // بيانات الموقوف المدخلة
+                    const detaineeData = {
+                        name: document.getElementById("name").value,
+                        nationality: nationality,
+                        id_type: id_type,
+                        id_number: id_number,
+                        date_of_birth: document.getElementById("date_of_birth").value,
+                        address: document.getElementById("address").value
+                    };
+    
+                    const token = localStorage.getItem("token"); // جلب التوكن الصحيح
+    
+                    if (!token) {
+                        alert("❌ لم يتم العثور على توكن، يرجى تسجيل الدخول!");
+                        return;
+                    }
+    
+                    // إرسال البيانات إلى الخادم
+                    fetch("https://wethaq-backend.vercel.app/api/detainees/create/", {
+                        method: "POST",
+                        headers: { 
+                            "Content-Type": "application/json",
+                            "Authorization": `Token ${token}` // استخدام التوكن بالشكل الصحيح
+                        },
+                        body: JSON.stringify(detaineeData) // إرسال البيانات المدخلة
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            // قراءة الاستجابة كـ نص لمعرفة تفاصيل الخطأ
+                            return response.text().then(text => {
+                                if (text.includes("duplicate key value violates unique constraint")) {
+                                    // التعامل مع الخطأ الذي يخص التكرار وإظهار رسالة واضحة
+                                    alert("❌ الرقم المدخل موجود بالفعل في النظام. الرجاء إدخال رقم هوية مختلف.");
+                                } else {
+                                    throw new Error(`❌ فشل الطلب. تفاصيل الاستجابة: ${text}`);
+                                }
+                            });
+                        }
+                        return response.json(); // إذا كانت الاستجابة ناجحة
+                    })
+                    .then(data => {
+                        if (data) {
+                            console.log("✅ تمت إضافة الشخص بنجاح:", data);
+                            alert("تمت إضافة الشخص بنجاح!");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("❌ حدث خطأ:", error);
+                        alert("❌ حدث خطأ. حاول مرة أخرى.");
+                    });
+                })
+                .catch(error => {
+                    console.error("❌ حدث خطأ أثناء التحقق من رقم الهوية:", error);
+                    alert("❌ حدث خطأ أثناء التحقق من رقم الهوية. حاول مرة أخرى.");
+                });
+        }
+    </script>
+</body>
+</html>

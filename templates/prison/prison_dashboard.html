@@ -1,0 +1,552 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - السجن</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+        }
+
+        header {
+            background-color: #4d6a5e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .content {
+            margin-top: 100px;
+            padding: 20px;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: -60px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        table th,
+        table td {
+            padding: 12px 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #4d6a5e;
+            color: white;
+        }
+
+        table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .view-button {
+            background-color: #4d6a5e;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .view-button:hover {
+            background-color: #7f9a84;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border: 2px solid #4d6a5e;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            width: 400px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .modal h3 {
+            margin-top: 0;
+            color: #4d6a5e;
+        }
+
+        .modal p {
+            margin: 10px 0;
+        }
+
+        .modal button {
+            background-color: #4d6a5e;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal button:hover {
+            background-color: #7f9a84;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #4d6a5e;
+            color: white;
+            height: 100%;
+            position: fixed;
+            top: 78px;
+            left: 0;
+            overflow: hidden;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white;
+            font-size: 1rem;
+            border-bottom: 1px solid #3b5447;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: #7f9a84;
+            color: white;
+            transform: translateX(5px);
+            font-weight: bold;
+        }
+
+        .menu-toggle {
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            color: white;
+            background-color: #4d6a5e;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background-color: #7f9a84;
+            transform: scale(1.1);
+        }
+
+        /* Stats Section */
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .stats-container-bottom {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
+            flex: 1;
+            /* يجعل العناصر تتوزع بشكل متساوي */
+            margin: 0 10px;
+            /* إضافة مسافة بين العناصر */
+        }
+
+        .stat-box:hover {
+            background-color: #7f9a84;
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .stat-box h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #4d6a5e;
+        }
+
+        .stat-box p {
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .stat-box:hover h3,.stat-box:hover p {
+            color: white;
+        }
+
+        .stat-box p {
+            margin: 5px 0 0;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .stat-box:hover h3,
+        .stat-box:hover p {
+            color: white;
+        }
+
+        /* زر عرض الملفات */
+        .btn {
+            display: block;
+            margin: 30px auto;
+            padding: 10px 20px;
+            background-color: #4d6a5e;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            text-align: center;
+            /* محاذاة النص في المنتصف */
+            width: 180px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* محاذاة الأزرار في المنتصف */
+        .row {
+            display: flex;
+            justify-content: center;
+            /* محاذاة العناصر أفقياً في المنتصف */
+            align-items: center;
+            /* محاذاة العناصر عمودياً في المنتصف */
+        }
+
+        .btn:hover {
+            background-color: #7f9a84;
+        }
+
+        /* Logout icon Styles */
+        .logout-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 20px;
+            position: fixed;
+            top: 19px;
+            left: 75px;
+            color: white;
+            background-color: #4d6a5e;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-icon:hover {
+            background-color: #7f9a84;
+            transform: scale(1.1);
+        }
+
+        /* Logout message Styles */
+        .logout-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 999;
+        }
+
+        .logout-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border: 2px solid #5a8d5c;
+            border-radius: 10px;
+            padding: 30px;
+            width: 480px;
+            height: 110px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .logout-message p {
+            font-size: 2rem;
+            color: #5a8d5c;
+            margin-top: 30px;
+            font-weight: bold;
+        }
+
+        .logout-message button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: transparent;
+            color: #871414;
+            border: none;
+            font-size: 2rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .logout-message button:hover {
+            background-color: #7f9a84;
+        }
+
+        footer {
+            background-color: #4d6a5e;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        .wethaq-logo {
+    position: absolute;
+    top: -7px;
+    right: 20px;
+    height: 90px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.wethaq-logo:hover {
+    transform: scale(1.1);
+}
+    </style>
+</head>
+
+<body>
+    <header>
+              <!-- شعار وثاق -->
+              <a href= "{% url 'prison_dashboard' %}">
+                <img src="{% static 'images/WethaqLogo.png' %}" class="wethaq-logo" alt="شعار وثاق">
+            </a> 
+        لوحة التحكم - السجن
+        <button class="menu-toggle" title="فتح القائمة الجانبية" onclick="toggleSidebar()">☰</button>
+        <button class="logout-icon" title="تسجيل الخروج" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+         
+        </button>
+        
+    </header>
+
+    <div class="sidebar" id="sidebar">
+        <a href="{% url 'prison_dashboard' %}">الرئيسية</a>
+        <a href="{% url 'view_prison_files' %}">عرض ورفع ملفات </a>
+        
+    </div>
+
+    <div class="content mt-5">
+        <div class="stats-container">
+            <!-- قضايا قيد التحقيق -->
+            <div class="stat-box">
+                <h3 id="cases_under_investigation">0</h3>
+                <p>قضايا قيد التحقيق</p>
+            </div>
+
+            <!-- قضايا في المحكمة -->
+            <div class="stat-box">
+                <h3 id="cases_in_court">0</h3>
+                <p>قضايا في المحكمة</p>
+            </div>
+
+            <!-- قضايا صدرت فيها الأحكام -->
+            <div class="stat-box">
+                <h3 id="cases_judgment_issued">0</h3>
+                <p>قضايا صدرت فيها الأحكام</p>
+            </div>
+        </div>
+
+        <div class="stats-container-bottom">
+            <!-- قضايا في السجن -->
+            <div class="stat-box">
+                <h3 id="cases_in_prison">0</h3>
+                <p>قضايا في السجن</p>
+            </div>
+
+            <!-- قضايا تم الإفراج عنها -->
+            <div class="stat-box">
+                <h3 id="cases_released">0</h3>
+                <p>قضايا تم الإفراج عنها</p>
+            </div>
+        </div>
+
+        <!-- زر عرض الملفات -->
+        <div class="row mt-4 justify-content-center">
+            <div class="col-auto">
+                <a href="{% url 'view_prison_files' %}" class="btn">عرض وتعديل الملفات</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- رسالة تسجيل الخروج -->
+    <div id="logoutOverlay" class="logout-overlay"></div>
+    <div id="logoutMessage" class="logout-message">
+        <p>جارِ إنهاء جلسة العمل...</p>
+        <button onclick="closeLogoutMessage()">×</button>
+    </div>
+
+    <footer>
+        جميع الحقوق محفوظة © وثاق 2024
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // جلب البيانات بعد تحميل الصفحة
+            fetchData();
+        });
+
+        let isSidebarOpen = false;
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("open");
+            isSidebarOpen = !isSidebarOpen;
+        }
+
+        function logout() {
+            const logoutOverlay = document.getElementById("logoutOverlay");
+            const logoutMessage = document.getElementById("logoutMessage");
+
+            logoutOverlay.style.display = "block"; // عرض الطبقة
+            logoutMessage.style.display = "block"; // عرض الرسالة
+
+            setTimeout(() => {
+                localStorage.removeItem("token"); // إزالة التوكن
+                window.location.href = "/"; // إعادة توجيه المستخدم إلى صفحة تسجيل الدخول
+            }, 3000); // تأخير لمدة 3 ثوانٍ قبل إعادة التوجيه
+        }
+
+        function closeLogoutMessage() {
+            const logoutOverlay = document.getElementById("logoutOverlay");
+            const logoutMessage = document.getElementById("logoutMessage");
+
+            logoutOverlay.style.display = "none"; // إخفاء الطبقة
+            logoutMessage.style.display = "none"; // إخفاء الرسالة
+        }
+
+        function fetchData() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("❌ لم يتم العثور على توكن، يرجى تسجيل الدخول!");
+                window.location.href = "/";
+                return;
+            }
+
+            const statusTypes = [
+                "under_investigation", // تحت التحقيق
+                "in_court",            // في المحكمة
+                "judgment_issued",     // تم إصدار الحكم
+                "in_prison",           // في السجن
+                "released"             // تم الإفراج عنه
+            ];
+
+            let stats = {
+                cases_under_investigation: 0,
+                cases_in_court: 0,
+                cases_judgment_issued: 0,
+                cases_in_prison: 0,
+                cases_released: 0
+            };
+
+            const fetchPromises = statusTypes.map(status => {
+                return fetch(`https://wethaq-backend.vercel.app/api/cases/?status=${status}`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Token ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(`Fetched data for status: ${status}`, data);
+                    data.forEach(caseData => {
+                        const caseStatus = caseData.status;
+                        const detaineeStatus = caseData.detainee_status;
+
+                        if ((caseStatus === "under_investigation" && detaineeStatus === "detained") ||
+                            (caseStatus === "in_court" && detaineeStatus === "under_review") ||
+                            (caseStatus === "judgment_issued" && detaineeStatus === "sentenced") ||
+                            (caseStatus === "in_prison" && detaineeStatus === "imprisoned") ||
+                            (caseStatus === "released" && detaineeStatus === "released")) {
+                            
+                            stats[`cases_${caseStatus}`]++;
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error("Error fetching data for status:", status, error);
+                });
+            });
+
+            Promise.all(fetchPromises).then(() => {
+                console.log('Statistics:', stats); // عرض الإحصائيات في الكونسول
+                updateStats(stats);  // تحديث الإحصائيات
+            });
+        }
+
+        function updateStats(stats) {
+            document.getElementById('cases_under_investigation').innerText = stats.cases_under_investigation || 0;
+            document.getElementById('cases_in_court').innerText = stats.cases_in_court || 0;
+            document.getElementById('cases_judgment_issued').innerText = stats.cases_judgment_issued || 0;
+            document.getElementById('cases_in_prison').innerText = stats.cases_in_prison || 0;
+            document.getElementById('cases_released').innerText = stats.cases_released || 0;
+        }
+    </script>
+</body>
+
+</html>

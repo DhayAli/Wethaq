@@ -1,0 +1,387 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة قضية</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+            background-color: #edf3f5;
+            padding: 0;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            width: 60%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 80px; /* إزاحة للأسفل لتجنب التداخل مع شريط الأدوات */
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #352872;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #352872;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .back-home-btn:hover {
+            background-color: #d7d6dd;
+        }
+
+        .back-home-btn {
+            display: inline-block;
+            padding: 4px 8px; /* تقليل حجم المربع المحيط بالسهم */
+            color: white; /* تغيير لون السهم إلى الأبيض */
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1.5rem;
+            text-align: center;
+            position: fixed;
+            top: 15px; /* تغيير الموضع ليكون فوق شريط الأدوات */
+            left: 20px;
+            cursor: pointer;
+            z-index: 1001; /* أعلى من شريط الأدوات */
+        }
+
+        /* شريط الأدوات */
+        .toolbar {
+            background-color: #352872;
+            padding: 35px; /* تصغير شريط الأدوات */
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        footer {
+            background-color: #352872;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        .wethaq-logo {
+    position: absolute;
+    top: -7px;
+    right: 20px;
+    height: 90px;
+    width: auto;
+    transition: transform 0.3s ease;
+    z-index: 1002; /* أعلى من شريط الأدوات */
+}
+.wethaq-logo:hover {
+    transform: scale(1.1);
+}
+    </style>
+</head>
+<body>
+    <header>
+     
+        <a href= "{% url 'center_dashboard' %}">
+         <img src="{% static 'images/WethaqLogo.png' %}" class="wethaq-logo" alt="شعار وثاق">
+     </a>
+     </header>
+    <!-- شريط الأدوات -->
+    <div class="toolbar">
+        <a href="{% url 'center_dashboard' %}" class="back-home-btn">⬅</a>
+    </div>
+
+    <div class="container">
+        <h2>إضافة قضية</h2>
+        
+        <!-- إدخال رقم الهوية -->
+        <div class="input-group">
+            <label for="id_number">رقم الهوية</label>
+            <input type="text" id="id_number" placeholder="أدخل رقم الهوية">
+            <small id="id_number-error" class="error"></small>
+        </div>
+
+        <!-- تفاصيل القضية -->
+        <div class="input-group">
+            <label for="charge">التهمة</label>
+            <input type="text" id="charge" placeholder="أدخل التهمة">
+            <small id="charge-error" class="error"></small>
+        </div>
+        <div class="input-group">
+            <label for="case_number">رقم القضية</label>
+            <input type="text" id="case_number" placeholder="أدخل رقم القضية">
+            <small id="case_number-error" class="error"></small>
+        </div>
+        <div class="input-group">
+            <label for="arresting_authority">جهة القبض</label>
+            <input type="text" id="arresting_authority" placeholder="أدخل الجهة الموقفة">
+            <small id="arresting_authority-error" class="error"></small>
+        </div>
+        <div class="input-group">
+            <label for="arresting_place">مكان التوقيف</label>
+            <input type="text" id="arresting_place" placeholder="أدخل مكان التوقيف">
+            <small id="arresting_place-error" class="error"></small>
+        </div>
+        <div class="input-group">
+            <label for="arresting_date">تاريخ التوقيف</label>
+            <input type="date" id="arresting_date">
+            <small id="arresting_date-error" class="error"></small>
+        </div>
+        <div class="input-group">
+            <label for="detention_agency">جهة التوقيف</label>
+            <input type="text" id="detention_agency" placeholder="أدخل وكالة التوقيف">
+            <small id="detention_agency-error" class="error"></small>
+        </div>
+
+        <!-- زر لإضافة القضية بعد التحقق من الموقوف -->
+        <button class="btn" onclick="checkDetaineeByIdNumber()">إضافة قضية</button>
+
+        <div class="message" id="success-message"></div>
+    </div>
+    <footer>
+        جميع الحقوق محفوظة © وثاق 2024
+    </footer>
+    <script>
+        function validateField(input, regex, errorMessage) {
+            const errorElement = document.getElementById(`${input.id}-error`);
+            if (!input.value.trim()) {
+                errorElement.textContent = "هذا الحقل مطلوب.";
+                errorElement.style.display = "block";
+                return false;
+            } else if (!regex.test(input.value)) {
+                errorElement.textContent = errorMessage;
+                errorElement.style.display = "block";
+                return false;
+            } else {
+                errorElement.style.display = "none";
+                return true;
+            }
+        }
+
+        function validateCaseNumber() {
+            return validateField(
+                document.getElementById("case_number"),
+                /^[0-9]{6}$/,
+                "رقم القضية يجب أن يتكون من 6 أرقام."
+            );
+        }
+
+        function validateTextFields() {
+            let valid = true;
+
+            valid &= validateField(
+                document.getElementById("charge"),
+                /^[\u0621-\u064A\s]+$/,
+                "التهمة يجب أن تحتوي على حروف عربية فقط بدون أرقام أو رموز."
+            );
+
+            valid &= validateField(
+                document.getElementById("arresting_authority"),
+                /^[\u0621-\u064A\s]+$/,
+                "الجهة الموقفة يجب أن تحتوي على حروف عربية فقط بدون أرقام أو رموز."
+            );
+
+            valid &= validateField(
+                document.getElementById("arresting_place"),
+                /^[\u0621-\u064A\s]+$/,
+                "مكان التوقيف يجب أن يحتوي على حروف عربية فقط بدون أرقام أو رموز."
+            );
+
+            valid &= validateField(
+                document.getElementById("detention_agency"),
+                /^[\u0621-\u064A\s]+$/,
+                "وكالة التوقيف يجب أن تحتوي على حروف عربية فقط بدون أرقام أو رموز."
+            );
+
+            return valid;
+        }
+
+        function checkCaseNumberExists(case_number) {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("❌ لم يتم العثور على توكن، يرجى تسجيل الدخول!");
+                return Promise.reject("No token found");
+            }
+
+            return fetch(`https://wethaq-backend.vercel.app/api/cases/`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Token ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // تحقق من وجود رقم القضية في البيانات
+                const exists = data.some(caseItem => caseItem.case_number === case_number);
+                return { exists };
+            });
+        }
+
+        // دالة للتحقق من الموقوف باستخدام رقم الهوية
+        function checkDetaineeByIdNumber() {
+            const idNumber = document.getElementById("id_number").value.trim();
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                alert("❌ لم يتم العثور على توكن، يرجى تسجيل الدخول!");
+                return;
+            }
+
+            // جلب بيانات المستخدم للحصول على center_id
+            fetch("https://wethaq-backend.vercel.app/api/users/", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Token ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(userData => {
+                const centerId = userData.center.id; // استخراج ID المركز
+                console.log("✅ تم جلب ID المركز:", centerId);
+
+                // الآن جلب بيانات الموقوفين
+                return fetch("https://wethaq-backend.vercel.app/api/detainees/", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Token ${token}`
+                    }
+                })
+                .then(response => response.json())
+                .then(detaineesData => {
+                    const detainee = detaineesData.find(d => d.id_number === idNumber);
+
+                    if (detainee) {
+                        console.log("✅ تم العثور على الموقوف:", detainee);
+                        addCase(detainee.id, centerId); // إرسال ID الموقوف و ID المركز إلى دالة إضافة القضية
+                    } else {
+                        alert("❌ لم يتم العثور على الموقوف بهذا الرقم.");
+                    }
+                });
+            })
+            .catch(error => {
+                console.error(error);
+                alert("❌ حدث خطأ أثناء البحث عن الموقوف أو جلب بيانات المستخدم.");
+            });
+        }
+
+        // دالة لإضافة القضية
+        function addCase(detaineeId, centerId) {
+            let valid = true;
+
+            // التحقق من صحة رقم القضية
+            valid &= validateCaseNumber();
+
+            // التحقق من صحة الحقول النصية
+            valid &= validateTextFields();
+
+            // إذا كانت البيانات غير صحيحة، إظهار رسالة خطأ
+            if (!valid) {
+                alert("البيانات خاطئة. يرجى مراجعتها.");
+                return;
+            }
+
+            const case_number = document.getElementById("case_number").value;
+
+            // التحقق مما إذا كان رقم القضية موجودًا مسبقًا
+            checkCaseNumberExists(case_number)
+                .then(data => {
+                    if (data.exists) {
+                        const caseNumberError = document.getElementById("case_number-error");
+                        caseNumberError.textContent = "❌ رقم القضية المدخل موجود بالفعل في النظام. الرجاء إدخال رقم قضية مختلف.";
+                        caseNumberError.style.display = "block";
+                        return;
+                    }
+
+                    const caseData = {
+                        detainee: detaineeId,
+                        center: centerId,
+                        charge: document.getElementById("charge").value,
+                        case_number: case_number,
+                        arresting_authority: document.getElementById("arresting_authority").value,
+                        arresting_place: document.getElementById("arresting_place").value,
+                        arresting_date: document.getElementById("arresting_date").value,
+                        detention_agency: document.getElementById("detention_agency").value
+                    };
+
+                    const token = localStorage.getItem("token");
+
+                    if (!token) {
+                        alert("❌ لم يتم العثور على توكن، يرجى تسجيل الدخول!");
+                        return;
+                    }
+
+                    fetch("https://wethaq-backend.vercel.app/api/cases/create/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Token ${token}`
+                        },
+                        body: JSON.stringify(caseData)
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        alert("تم إضافة القضية بنجاح!");
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        console.error(error);
+                        alert("حدث خطأ أثناء إضافة القضية.");
+                    });
+                })
+                .catch(error => {
+                    console.error("❌ حدث خطأ أثناء التحقق من رقم القضية:", error);
+                    alert("❌ حدث خطأ أثناء التحقق من رقم القضية. حاول مرة أخرى.");
+                });
+        }
+    </script>
+</body>
+</html>

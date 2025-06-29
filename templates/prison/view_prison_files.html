@@ -1,0 +1,415 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض ملفات السجن</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        :root {
+            --main-bg-color: #4d6a5e;
+            --main-text-color: white;
+            --hover-bg-color: #7f9a84;
+            --link-border-color: #3b5447;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            margin-top: 140px;
+        }
+
+        footer {
+            background-color: var(--main-bg-color);
+            color: var(--main-text-color);
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            z-index: 1000;
+        }
+
+        header {
+            background-color: #4d6a5e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .menu-toggle {
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background-color: #4d6a5e;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            z-index: 2000;
+        }
+
+        .menu-toggle:hover {
+            background-color: #7f9a84;
+            transform: scale(1.1);
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 250px;
+            height: calc(100% - 80px);
+            background-color: var(--main-bg-color);
+            color: var(--main-text-color);
+            z-index: 1000;
+            box-shadow: 2px 0 5px var(--shadow-color);
+            overflow-y: auto;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: var(--main-text-color);
+            font-size: 1rem;
+            border-bottom: 1px solid var(--link-border-color);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: var(--hover-bg-color);
+            transform: translateX(5px);
+            font-weight: bold;
+        }
+
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: 80%;
+            min-height: calc(100vh - 85px);
+        }
+
+        .table-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            background-color: #ffffff;
+        }
+
+        .table th,
+        .table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .table th {
+            background-color: #4d6a5e;
+            color: white;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-button {
+            background-color: #4d6a5e;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .edit-button:hover {
+            background-color: #7f9a84;
+        }
+
+        .logout-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 20px;
+            position: fixed;
+            top: 20px;
+            left: 100px;
+            color: white;
+            background-color: #4d6a5e;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border: 2px solid #5a8d5c;
+            border-radius: 10px;
+            padding: 30px;
+            width: 480px;
+            height: 150px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .logout-message p {
+            font-size: 1.2rem;
+            color: #5a8d5c;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .logout-message button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: transparent;
+            color: #871414;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+        }
+        
+        footer {
+            background-color: #4d6a5e;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        .wethaq-logo {
+    position: absolute;
+    top: -7px;
+    right: 20px;
+    height: 90px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.wethaq-logo:hover {
+    transform: scale(1.1);
+}
+    </style>
+</head>
+
+<body class="bg-light">
+    <header>
+         <!-- شعار وثاق -->
+         <a href= "{% url 'prison_dashboard' %}">
+            <img src="{% static 'images/WethaqLogo.png' %}" class="wethaq-logo" alt="شعار وثاق">
+        </a> 
+        عرض القضايا
+        <button class="menu-toggle" title="فتح القائمة الجانبية" onclick="toggleSidebar()">☰</button>
+        <button class="logout-icon" title="تسجيل الخروج" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i>
+        </button>
+    </header>
+
+    <div class="sidebar" id="sidebar">
+        <a href="{% url 'prison_dashboard' %}">الرئيسية</a>
+        <a href="{% url 'upload_document' %}">رفع مستند</a>
+        <a href="{% url 'view_prison_files' %}">عرض القضايا</a>
+    </div>
+
+    <div class="container">
+        <h2 class="text-center mb-4">القضايا</h2>
+        <!-- إضافة مربع البحث -->
+        <input type="text" id="searchInput" class="form-control mb-3" placeholder="ابحث بالاسم او برقم الهوية . . .">
+        <div class="card shadow">
+            <div class="card-body">
+                <table class="table table-striped" id="casesTable">
+                    <thead>
+                        <tr>
+                            <th>اسم السجين</th>
+                            <th>رقم الهوية</th>
+                            <th>حالة القضية</th>
+                            <th>تعديل القضية</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="logoutOverlay" class="logout-overlay"></div>
+    <div id="logoutMessage" class="logout-message">
+        <p>جارِ إنهاء الجلسة...</p>
+        <button onclick="closeLogoutMessage()">×</button>
+    </div>
+    <footer>
+        جميع الحقوق محفوظة © وثاق 2024
+    </footer>
+    <script>
+
+        let isSidebarOpen = false; // تعريف المتغير
+    
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            sidebar.classList.toggle("open");
+            isSidebarOpen = !isSidebarOpen;
+        }
+    
+        document.addEventListener("click", (event) => {
+            const sidebar = document.getElementById("sidebar");
+            const menuToggle = document.querySelector(".menu-toggle");
+    
+            if (isSidebarOpen && !sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove("open");
+                isSidebarOpen = false;
+            }
+        });
+    
+        let logoutCancelled = false;
+    
+        function logout() {
+            logoutCancelled = false;
+            const logoutOverlay = document.getElementById("logoutOverlay");
+            const logoutMessage = document.getElementById("logoutMessage");
+    
+            logoutOverlay.style.display = "block";
+            logoutMessage.style.display = "block";
+    
+            setTimeout(() => {
+                if (!logoutCancelled) {
+                    localStorage.removeItem("token");
+                    window.location.href = "/";
+                }
+            }, 3000);
+        }
+    
+        function closeLogoutMessage() {
+            logoutCancelled = true;
+            const logoutOverlay = document.getElementById("logoutOverlay");
+            const logoutMessage = document.getElementById("logoutMessage");
+    
+            logoutOverlay.style.display = "none";
+            logoutMessage.style.display = "none";
+        }
+    
+        // جلب القضايا من API
+        const token = localStorage.getItem("token");
+    
+        if (!token) {
+            alert("❌ لم يتم العثور على توكن، يرجى تسجيل الدخول!");
+            window.location.href = "/";
+        }
+    
+        // جلب القضايا من API
+        fetch("https://wethaq-backend.vercel.app/api/cases/", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Token ${token}`
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then(data => {
+            const tbody = document.querySelector("#casesTable tbody");
+            // دالة لترجمة حالة القضية من الإنجليزية إلى العربية
+    function translateStatus(status) {
+        const statuses = {
+            'under_investigation': 'قيد التحقيق',
+            'in_court': 'في المحكمة',
+            'judgment_issued': 'صدر الحكم',
+            'in_prison': 'في السجن',
+            'released': 'تم الإفراج عنه'
+        };
+        return statuses[status] || status; // إذا لم تكن الحالة موجودة، تبقى كما هي
+    }
+
+    // عند إضافة الصفوف إلى الجدول، نترجم حالة القضية
+    data.forEach(caseData => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${caseData.detainee.name}</td>
+            <td>${caseData.detainee.id_number}</td>
+            <td>${translateStatus(caseData.status)}</td>
+            <td><a href="/prison/upload-document/?id=${caseData.id}" class="edit-button">تعديل القضية</a></td>
+        `;
+        tbody.appendChild(row);
+    });
+})
+.catch(error => {
+    console.error("Error fetching data:", error);
+    alert("❌ حدث خطأ أثناء تحميل البيانات.");
+});
+    
+        // تصفية القضايا بواسطة مربع البحث
+        document.getElementById('searchInput').addEventListener('keyup', function(event) {
+            let filter = event.target.value.toLowerCase();
+            let rows = document.querySelectorAll("#casesTable tbody tr");
+            rows.forEach(row => {
+                let cells = row.querySelectorAll("td");
+                let matched = false;
+                cells.forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(filter)) {
+                        matched = true;
+                    }
+                });
+                row.style.display = matched ? '' : 'none';
+            });
+        });
+    </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

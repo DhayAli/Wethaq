@@ -1,0 +1,197 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #89A498;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .navbar {
+            background-color: #89A498;
+            width: 100%;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            color: white;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #734a2a;
+        }
+
+        .background-container {
+            width: 90%;
+            height: 80vh;
+            background: #89A498;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .login-container {
+            background: white;
+            width: 350px;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #E1E3DA;
+            border-radius: 50%;
+            padding: 15px;
+        }
+
+        .logo-container img {
+            width: 60px;
+        }
+
+        h2 {
+            margin-top: 30px;
+            color: #333;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 97%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 103%;
+            padding: 10px;
+            background-color: #A88F74;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #734a2a;
+        }
+    </style>
+</head>
+
+<body>
+  
+    <div class="background-container">
+        <div class="login-container">
+            <div class="logo-container">
+                <img src="{% static 'images/WethaqLogo.png' %}" alt="شعار المشروع">
+            </div>
+            <h2>تسجيل الدخول</h2>
+            <p>اهلا بك في وثاق<br> من فضلك قم بتسجيل الدخول</p>
+            <form id="loginForm">
+                <input type="text" id="username" placeholder="اسم المستخدم" required><br>
+                <input type="password" id="password" placeholder="كلمة المرور" required><br>
+                <button type="submit">تسجيل الدخول</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+
+            try {
+                let loginResponse = await fetch("https://wethaq-backend.vercel.app/api/users/login/", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username: username, password: password })
+                });
+
+                if (!loginResponse.ok) {
+                    throw new Error("بيانات تسجيل الدخول غير صحيحة.");
+                }
+
+                let loginData = await loginResponse.json();
+                let token = loginData.token;
+
+                localStorage.setItem("token", token);
+
+                let userResponse = await fetch("https://wethaq-backend.vercel.app/api/users/", {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Token ${token}`
+                    }
+                });
+
+                if (!userResponse.ok) {
+                    throw new Error("فشل في جلب بيانات المستخدم.");
+                }
+
+                let userData = await userResponse.json();
+
+                console.log("🔹 بيانات المستخدم:", userData);
+                console.log("🔹 دور المستخدم:", userData.user.role);
+                console.log("🔹 بيانات المركز:", userData.center);
+
+                let userRole = userData.user.role;
+                let userCenter = userData.center;
+
+                alert("تم تسجيل الدخول بنجاح!");
+                console.log("✅ تم تخزين التوكن:", localStorage.getItem("token"));
+
+                if (userRole === "observer") {
+                    window.location.href = "/observer/dashboard/";
+                } else if (userRole === "prison_director") {
+                    window.location.href = "/prison/dashboard/";
+                } else if (userCenter) {
+                    window.location.href = "/center/dashboard/";
+                } else {
+                    alert("نوع المستخدم غير معروف!");
+                }
+
+            } catch (error) {
+                console.error("❌ خطأ:", error);
+                alert(error.message);
+            }
+        });
+    </script>
+</body>
+
+</html>

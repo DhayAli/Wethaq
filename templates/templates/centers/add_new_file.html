@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة ملف جديد</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+            background-color: #edf3f5;
+            padding: 20px;
+        }
+
+        .container {
+            width: 60%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #8B5E34;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #734a2a;
+        }
+
+        .error-message {
+            margin-top: 5px;
+            color: red;
+            font-size: 14px;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>إضافة ملف جديد</h2>
+        <div class="input-group">
+            <label for="identity">رقم الهوية</label>
+            <input type="text" id="identity" placeholder="أدخل رقم الهوية">
+            <span class="error-message" id="identity-error"></span>
+            <button class="btn" onclick="checkIdentity()">تحقق من الهوية</button>
+        </div>
+        <div id="form-container" style="display: none;">
+            <div class="input-group">
+                <label for="name">الاسم</label>
+                <input type="text" id="name" placeholder="أدخل الاسم">
+                <span class="error-message" id="name-error"></span>
+            </div>
+            <div class="input-group">
+                <label for="id_type">نوع الهوية</label>
+                <input type="text" id="id_type" placeholder="أدخل نوع الهوية">
+                <span class="error-message" id="id_type-error"></span>
+            </div>
+            <div class="input-group">
+                <label for="nationality">الجنسية</label>
+                <input type="text" id="nationality" placeholder="أدخل الجنسية">
+                <span class="error-message" id="nationality-error"></span>
+            </div>
+            <div class="input-group">
+                <label for="birthdate">تاريخ الميلاد</label>
+                <input type="date" id="birthdate">
+                <span class="error-message" id="birthdate-error"></span>
+            </div>
+            <div class="input-group">
+                <label for="accusation">التهمة</label>
+                <input type="text" id="accusation" placeholder="أدخل التهمة">
+                <span class="error-message" id="accusation-error"></span>
+            </div>
+            <div class="input-group">
+                <label for="arrest_agency">جهة القبض</label>
+                <input type="text" id="arrest_agency" placeholder="أدخل جهة القبض">
+                <span class="error-message" id="arrest_agency-error"></span>
+            </div>
+            <div class="input-group">
+                <label for="arrest_location">مكان القبض</label>
+                <input type="text" id="arrest_location" placeholder="أدخل مكان القبض">
+                <span class="error-message" id="arrest_location-error"></span>
+            </div>
+            <div class="input-group">
+                <label for="arrest_date">تاريخ القبض</label>
+                <input type="date" id="arrest_date">
+                <span class="error-message" id="arrest_date-error"></span>
+            </div>
+            <div class="input-group">
+                <label for="address">العنوان</label>
+                <input type="text" id="address" placeholder="أدخل العنوان">
+                <span class="error-message" id="address-error"></span>
+            </div>
+            <div class="input-group">
+                <label for="phone_number">رقم الجوال</label>
+                <input type="text" id="phone_number" placeholder="أدخل رقم الجوال">
+                <span class="error-message" id="phone_number-error"></span>
+            </div>
+            <div class="input-group">
+                <label for="case_number">رقم القضية من الداتابيس</label>
+                <input type="text" id="case_number" placeholder="أدخل رقم القضية">
+                <span class="error-message" id="case_number-error"></span>
+            </div>
+            <div class="input-group">
+                <label for="detention_agency">جهة التوقيف</label>
+                <input type="text" id="detention_agency" placeholder="أدخل جهة التوقيف">
+                <span class="error-message" id="detention_agency-error"></span>
+            </div>
+            <button class="btn" onclick="validateAndSubmit()">إضافة ملف جديد</button>
+        </div>
+        <div class="message" id="success-message">تمت إضافة الملف بنجاح. رقم الملف الجديد: <span
+                id="file-number"></span></div>
+    </div>
+
+    <script>
+        function checkIdentity() {
+            const identity = document.getElementById("identity").value.trim();
+            const identityError = document.getElementById("identity-error");
+
+            if (!/^[0-9\u0660-\u0669]{10}$/.test(identity)) {
+                identityError.textContent = "رقم الهوية يجب أن يكون 10 أرقام صحيحة.";
+                return;
+            }
+
+            identityError.textContent = "";
+            document.getElementById("form-container").style.display = "block";
+        }
+
+        function validateField(input, regex, errorMessage) {
+            const errorElement = document.getElementById(`${input.id}-error`);
+            if (!input.value.trim()) {
+                errorElement.textContent = "هذا الحقل مطلوب.";
+                return false;
+            } else if (!regex.test(input.value)) {
+                errorElement.textContent = errorMessage;
+                return false;
+            } else {
+                errorElement.textContent = "";
+                return true;
+            }
+        }
+
+        function validateAndSubmit() {
+            let valid = true;
+
+            valid &= validateField(
+                document.getElementById("phone_number"),
+                /^[0-9\u0660-\u0669]{10}$/,
+                "رقم الجوال يجب أن يحتوي على 10 أرقام صحيحة (عربي أو إنجليزي)."
+            );
+
+            valid &= validateField(
+                document.getElementById("case_number"),
+                /^[0-9\u0660-\u0669]+$/,
+                "رقم القضية يجب أن يحتوي على أرقام فقط (عربي أو إنجليزي)."
+            );
+            const birthdateInput = document.getElementById("birthdate");
+            const birthdateError = document.getElementById("birthdate-error");
+            if (!birthdateInput.value.trim()) {
+                birthdateError.textContent = "تاريخ الميلاد مطلوب.";
+                valid = false;
+            } else if (new Date(birthdateInput.value) > new Date()) {
+                birthdateError.textContent = "تاريخ الميلاد لا يمكن أن يكون في المستقبل.";
+                valid = false;
+            } else {
+                birthdateError.textContent = "";
+            }
+            const arrestDateInput = document.getElementById("arrest_date");
+            const arrestDateError = document.getElementById("arrest_date-error");
+            if (!arrestDateInput.value.trim()) {
+                arrestDateError.textContent = "تاريخ القبض مطلوب.";
+                valid = false;
+            } else if (new Date(arrestDateInput.value) > new Date()) {
+                arrestDateError.textContent = "تاريخ القبض لا يمكن أن يكون في المستقبل.";
+                valid = false;
+            } else {
+                arrestDateError.textContent = "";
+            }
+
+            // تحقق من الحقول النصية (أحرف عربية فقط بدون أرقام)
+            valid &= validateField(
+                document.getElementById("name"),
+                /^[\u0621-\u064A\s]+$/,
+                "الاسم يجب أن يحتوي على أحرف عربية فقط بدون أرقام."
+            );
+
+            valid &= validateField(
+                document.getElementById("id_type"),
+                /^[\u0621-\u064A\s]+$/,
+                "نوع الهوية يجب أن يحتوي على أحرف عربية فقط بدون أرقام."
+            );
+
+            valid &= validateField(
+                document.getElementById("nationality"),
+                /^[\u0621-\u064A\s]+$/,
+                "الجنسية يجب أن تحتوي على أحرف عربية فقط بدون أرقام."
+            );
+
+            valid &= validateField(
+                document.getElementById("accusation"),
+                /^[\u0621-\u064A\s]+$/,
+                "التهمة يجب أن تحتوي على أحرف عربية فقط بدون أرقام."
+            );
+
+            valid &= validateField(
+                document.getElementById("arrest_agency"),
+                /^[\u0621-\u064A\s]+$/,
+                "جهة القبض يجب أن تحتوي على أحرف عربية فقط بدون أرقام."
+            );
+
+            valid &= validateField(
+                document.getElementById("arrest_location"),
+                /^[\u0621-\u064A\s]+$/,
+                "مكان القبض يجب أن يحتوي على أحرف عربية فقط بدون أرقام."
+            );
+
+            valid &= validateField(
+                document.getElementById("address"),
+                /^[\u0621-\u064A\s]+$/,
+                "العنوان يجب أن يحتوي على أحرف عربية فقط بدون أرقام."
+            );
+
+            valid &= validateField(
+                document.getElementById("detention_agency"),
+                /^[\u0621-\u064A\s]+$/,
+                "جهة التوقيف يجب أن تحتوي على أحرف عربية فقط بدون أرقام."
+            );
+
+            if (valid) {
+                const fileNumber = Math.floor(Math.random() * 100000);
+                document.getElementById("success-message").style.display = "block";
+                document.getElementById("file-number").innerText = fileNumber;
+            }
+        }
+
+
+
+        // دالة التحقق من الاسم
+        function validateName(input) {
+            const regexArabicLettersOnly = /^[\u0621-\u064A\s]+$/; // السماح فقط بالأحرف العربية بدون أرقام
+            if (!input.value.trim()) {
+                return "هذا الحقل مطلوب.";
+            } else if (!regexArabicLettersOnly.test(input.value)) {
+                return "الاسم يجب أن يحتوي على أحرف عربية فقط بدون أرقام.";
+            }
+            return "";
+        }
+
+
+
+        function checkIdentity() {
+            const identity = document.getElementById("identity").value;
+            const identityError = document.getElementById("identity-error");
+
+            // التحقق من الأرقام سواء كانت عربية أو إنجليزية
+            const arabicNumbersRegex = /^[\u0660-\u0669]+$/; // أرقام عربية
+            const englishNumbersRegex = /^[0-9]+$/; // أرقام إنجليزية
+
+            if (!identity) {
+                identityError.textContent = "هذا الحقل مطلوب. يرجى تعبئته.";
+                return;
+            }
+
+            if (!(identity.length === 10 && (arabicNumbersRegex.test(identity) || englishNumbersRegex.test(identity)))) {
+                identityError.textContent = "رقم الهوية يجب أن يكون 10 أرقام صحيحة.";
+                return;
+            }
+
+            // إذا كان المدخل صحيحًا
+            identityError.textContent = "";
+            document.getElementById("form-container").style.display = "block";
+        }
+
+    </script>
+</body>
+
+</html>

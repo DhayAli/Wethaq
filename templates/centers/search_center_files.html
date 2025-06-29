@@ -1,0 +1,507 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بحث ملفات المركز</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* تغيير لون زر عرض */
+    .btn-info {
+        background-color: #352872;  /* اللون الأساسي للزر */
+        color: white;  /* تغيير لون النص إلى الأبيض */
+        border: none;
+        padding: 8px 16px;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+
+    /* تغيير لون زر عرض عند التمرير عليه */
+    .btn-info:hover {
+        background-color:#352872;  /* اللون عند التمرير */
+        transform: scale(1.1);  /* تكبير الزر قليلاً عند التمرير */
+    }
+
+    /* إذا أردت تغيير الزر عند النقر */
+    .btn-info:active {
+        background-color: #352872;  /* اللون عند النقر */
+    }
+        .view-button {
+            background-color: #352872;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .view-button:hover {
+            background-color: #5e55bc;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+        }
+
+        header {
+            background-color: #352872;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .content {
+            margin-top: 100px;
+            padding: 20px;
+        }
+
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-container input[type="text"] {
+            width: 50%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 5px;
+            outline: none;
+        }
+
+        .search-container button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #352872;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #5e55bc;
+        }
+
+        .suggestion-list {
+            position: absolute;
+            background-color: white;
+            z-index: 999;
+            width: 51%;
+            max-height: 150px;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 0;
+            margin-top: -5px;
+            left: 53%;
+            transform: translateX(-50%);
+            border-radius: 5px;
+            display: none;
+            border: 1px solid #ccc;
+        }
+
+        .suggestion-list li {
+            padding: 10px;
+            cursor: pointer;
+            text-align: right;
+        }
+
+        .suggestion-list li:hover {
+            background-color: #f0f0f0;
+        }
+
+        .results-container {
+            margin-top: 20px;
+            direction: rtl;
+            display: none;
+        }
+
+        .result-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background-color: #352872;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .result-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        footer {
+            background-color: #352872;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .back-home-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #352872;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            text-align: center;
+            position: fixed;
+            bottom: 70px;
+            left: 40px;
+            cursor: pointer;
+            z-index: 900;
+        }
+
+        .back-home-btn:hover {
+            background-color: #5e55bc;
+        }
+
+        .menu-toggle {
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            color: white;
+            background-color: #352872;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background-color: #5e55bc;
+            transform: scale(1.1);
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #352872;
+            color: white;
+            height: 100%;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1100;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white;
+            font-size: 1rem;
+            border-bottom: 1px solid #352872;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: #5e55bc;
+            color: white;
+            transform: translateX(5px);
+            font-weight: bold;
+        }
+        footer {
+            background-color: #352872;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        
+        .table {
+    border: 2px solid rgb(115, 114, 114); /* حدود الجدول الخارجية */
+}
+
+.table th, .table td {
+    border: 1px solid rgb(115, 114, 114); /* حدود الخلايا */
+}
+.wethaq-logo {
+    position: absolute;
+    top: -7px;
+    right: 20px;
+    height: 90px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.wethaq-logo:hover {
+    transform: scale(1.1);
+}
+
+    </style>
+</head>
+<header>
+    البحث داخل المركز
+    <button class="menu-toggle" title="فتح القائمة الجانبية" onclick="toggleSidebar()">☰</button>
+       <!-- شعار وثاق -->
+       <a href= "{% url 'center_dashboard' %}">
+        <img src="{% static 'images/WethaqLogo.png' %}" class="wethaq-logo" alt="شعار وثاق">
+    </a> 
+</header>
+
+<div class="sidebar" id="sidebar">
+    <a href="{% url 'center_dashboard' %}">الصفحة الرئيسية</a>
+    <a href="{% url 'add_new_detainess' %}">إضافة موقوف جديد</a>
+    <a href="{% url 'view_all_files' %}">عرض الملفات</a>
+    <a href="{% url 'search_center_files' %}">بحث الملفات</a>
+    <a href="{% url 'add_new_case' %}">اضافة قضية جديدة</a>
+</div>
+
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="content">
+            <div class="search-container">
+                <input type="text" id="search_keyword" placeholder="أدخل الاسم أو رقم الهوية" required>
+                <button type="button" id="searchButton">بحث</button>
+                <ul id="suggestions" class="suggestion-list"></ul>
+            </div>
+
+            <div id="errorMessage" class="error-message">يرجى إدخال الاسم أو رقم الهوية للبحث.</div>
+            <div id="noResults" class="no-results d-none">لا توجد نتائج مطابقة.</div>
+
+            <table class="table table-bordered d-none" id="resultsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>رقم الملف</th>
+                        <th>اسم الموقوف</th>
+                        <th>تفاصيل القضية</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="fileDetailsModal" tabindex="-1" aria-labelledby="fileDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fileDetailsModalLabel">تفاصيل الملف</h5>
+                </div>
+                <div class="modal-body" id="modalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <a href="{% url 'center_dashboard' %}" class="back-home-btn">⬅</a>
+    <footer>
+        جميع الحقوق محفوظة © وثاق 2024
+    </footer>
+
+    <script>
+        let isSidebarOpen = false;
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            if (isSidebarOpen) {
+                sidebar.classList.remove('open');
+            } else {
+                sidebar.classList.add('open');
+            }
+            isSidebarOpen = !isSidebarOpen;
+        }
+
+        document.addEventListener("click", (event) => {
+            const sidebar = document.getElementById("sidebar");
+            const menuToggle = document.querySelector(".menu-toggle");
+
+            if (isSidebarOpen && !sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove("open");
+                isSidebarOpen = false;
+            }
+        });
+
+        const searchKeyword = document.getElementById("search_keyword");
+        const resultsTable = document.getElementById("resultsTable");
+        const noResults = document.getElementById("noResults");
+        const resultsBody = document.getElementById("resultsBody");
+        const searchButton = document.getElementById("searchButton");
+        const errorMessage = document.getElementById("errorMessage");
+
+        const API_URL = "https://wethaq-backend.vercel.app/api/cases/";
+        const token = localStorage.getItem("token");
+
+        function formatIdType(idType) {
+            const idTypes = {
+                'civil_registry': 'السجل المدني',
+    'resident_id': 'هوية مقيم',
+    'violator_refugee_id': 'هوية مخالف لاجئ',
+    'replacement_card': 'بطاقة بديلة'
+};
+            return idTypes[idType] || "غير معروف";
+        }
+
+        function search(keyword) {
+            const trimmedKeyword = keyword.trim();
+
+            if (trimmedKeyword === "") {
+                resultsBody.innerHTML = "";
+                resultsTable.classList.add("d-none");
+                noResults.classList.add("d-none");
+                return;
+            }
+
+            fetch(`${API_URL}?search=${encodeURIComponent(trimmedKeyword)}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Token ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                resultsBody.innerHTML = "";
+                if (data.length > 0) {
+                    resultsTable.classList.remove("d-none");
+                    noResults.classList.add("d-none");
+
+                    data.forEach(caseItem => {
+                        const row = `
+                            <tr>
+                                <td>${caseItem.case_number}</td>
+                                <td>${caseItem.detainee.name}</td>
+                                <td>${caseItem.charge}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-info" onclick="showDetails(${caseItem.id})">عرض</button>
+                                </td>
+                            </tr>`;
+                        resultsBody.innerHTML += row;
+                    });
+                } else {
+                    resultsTable.classList.add("d-none");
+                    noResults.classList.remove("d-none");
+                    noResults.textContent = "لا توجد نتائج مطابقة.";
+                }
+            })
+            .catch(error => {
+                console.error("حدث خطأ:", error);
+                alert("❌ حدث خطأ أثناء جلب البيانات.");
+            });
+        }
+
+        function formatStatus(status) {
+            const statusMapping = {
+                "detained": "موقوف",
+                "under_review": "قيد المراجعة",
+                "sentenced": "صدر الحكم",
+                "imprisoned": "في السجن",
+                "released": "مفرج عنه"
+            };
+            return statusMapping[status] || "غير معروف";
+        }
+
+        searchButton.addEventListener("click", function () {
+            const keyword = searchKeyword.value.trim();
+            if (keyword === "") {
+                errorMessage.classList.remove("d-none");
+            } else {
+                errorMessage.classList.add("d-none");
+                search(keyword);
+            }
+        });
+
+        searchKeyword.addEventListener("input", function () {
+            const keyword = searchKeyword.value.trim();
+            errorMessage.classList.add("d-none");
+            search(keyword);
+        });
+
+        function showDetails(caseId) {
+            fetch(`${API_URL}${caseId}/`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Token ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(record => {
+                const modalBody = document.querySelector("#fileDetailsModal .modal-body");
+                modalBody.innerHTML = `
+                    <p><strong>رقم القضية:</strong> ${record.case_number}</p>
+                      <p><strong>رقم الهوية:</strong> ${record.detainee.id_number}</p>
+                    <p><strong>اسم الموقوف:</strong> ${record.detainee.name}</p>
+                    <p><strong>الجنسية:</strong> ${record.detainee.nationality}</p>
+                    <p><strong>نوع الهوية:</strong> ${formatIdType(record.detainee.id_type)}</p>
+                    <p><strong>تاريخ الميلاد:</strong> ${record.detainee.date_of_birth}</p>
+                    <p><strong>العنوان:</strong> ${record.detainee.address}</p>
+                    <p><strong>التهمة:</strong> ${record.charge}</p>
+                    <p><strong>جهة القبض:</strong> ${record.arresting_authority}</p>
+                    <p><strong>مكان القبض:</strong> ${record.arresting_place}</p>
+                    <p><strong>تاريخ القبض:</strong> ${record.arresting_date}</p>
+                    <p><strong>جهة التوقيف:</strong> ${record.detention_agency}</p>
+                    <p><strong>حالة القضية:</strong> ${formatStatus(record.detainee_status)}</p>
+                `;
+                const fileDetailsModal = new bootstrap.Modal(document.getElementById("fileDetailsModal"));
+                fileDetailsModal.show();
+            })
+            .catch(error => {
+                console.error("حدث خطأ أثناء جلب التفاصيل:", error);
+                alert("❌ حدث خطأ أثناء جلب تفاصيل الملف.");
+            });
+        }
+
+        window.showDetails = showDetails;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

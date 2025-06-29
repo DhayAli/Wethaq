@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض السجلات السابقة</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+        }
+
+        header {
+            background-color: #4d6a5e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .content {
+            margin-top: 100px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-container input[type="text"] {
+            width: 60%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .search-container button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #4d6a5e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #3b5447;
+        }
+
+        .results-container {
+            margin-top: 20px;
+            text-align: center;
+            color: #555;
+        }
+
+        .result-item {
+            background-color: white;
+            margin: 10px auto;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            text-align: right;
+        }
+
+        table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4d6a5e;
+            color: white;
+        }
+
+        a {
+            color: #4d6a5e;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            background-color: #4d6a5e;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .back-home-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4d6a5e;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-home-btn:hover {
+            background-color: #3b5447;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        عرض السجلات السابقة
+    </header>
+
+    <div class="content">
+        <!-- Search Box -->
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="أدخل رقم تعريف السجين أو اسم السجين" onkeypress="handleKeyPress(event)">
+            <button onclick="searchRecords()">بحث</button>
+        </div>
+
+        <!-- Back to Home Button -->
+        <div>
+            <a href="{% url 'observer_dashboard' %}" class="back-home-btn">⬅ العودة إلى الصفحة الرئيسية</a>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-container" id="resultsContainer">
+            <!-- Placeholder for results -->
+        </div>
+    </div>
+
+    <footer>
+        جميع الحقوق محفوظة © وثاق 2024
+    </footer>
+
+    <script>
+        function searchRecords() {
+            const searchInput = document.getElementById("searchInput").value.trim();
+            const resultsContainer = document.getElementById("resultsContainer");
+
+            // Clear previous results
+            resultsContainer.innerHTML = "";
+
+            if (searchInput === "") {
+                resultsContainer.innerHTML = "<p>يرجى إدخال رقم تعريف السجين أو اسم السجين.</p>";
+                return;
+            }
+
+            // Display table with results (placeholder data)
+            resultsContainer.innerHTML = `
+                <p>عرض السجلات السابقة للسجين برقم التعريف: <strong>${searchInput}</strong></p>
+                <table>
+                    <tr>
+                        <th>رقم الملف</th>
+                        <th>نوع القضية</th>
+                        <th>الحالة</th>
+                        <th>التاريخ</th>
+                        <th>التفاصيل</th>
+                    </tr>
+                    <tr>
+                        <td>101</td>
+                        <td>سرقة</td>
+                        <td>مغلقة</td>
+                        <td>2023-12-01</td>
+                        <td><a href="#">عرض التفاصيل</a></td>
+                    </tr>
+                    <tr>
+                        <td>102</td>
+                        <td>احتيال</td>
+                        <td>تحت التحقيق</td>
+                        <td>2024-01-15</td>
+                        <td><a href="#">عرض التفاصيل</a></td>
+                    </tr>
+                </table>
+            `;
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                searchRecords();
+            }
+        }
+    </script>
+</body>
+
+</html>

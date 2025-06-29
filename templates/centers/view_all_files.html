@@ -1,0 +1,373 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض الملفات</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* الأنماط العامة */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+        }
+
+        /* رأس الصفحة */
+        header {
+            background-color: #352872;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* زر القائمة الجانبية */
+        .menu-toggle {
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            color: white;
+            background-color: #352872;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background-color: #5e55bc;
+            transform: scale(1.1);
+        }
+
+        /* القائمة الجانبية */
+        .offcanvas {
+            width: 250px;
+            background-color: #352872;
+            color: white;
+            height: 100%;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1100; /* رفع مستوى الظهور فوق الجدول */
+        }
+
+        .offcanvas a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white;
+            font-size: 1rem;
+            border-bottom: 1px solid #5e55bc;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+        }
+
+        .offcanvas a:hover {
+            background-color: #5e55bc;
+            color: white;
+            transform: translateX(5px);
+            font-weight: bold;
+        }
+
+        /* محتوى الصفحة */
+        .content {
+            margin-top: 120px;
+            padding: 100px;
+            text-align: center;
+            position: relative;
+            z-index: 1000;
+        }
+
+        /* تنسيق الجدول */
+        .table {
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            z-index: 100;
+        }
+
+        .table th {
+            background-color: #352872;
+            color: white;
+            text-align: center;
+        }
+
+        .table td {
+            text-align: center;
+        }
+
+        /* زر التفاصيل */
+        .btn-primary {
+            background-color: #352872;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #5e55bc;
+        }
+
+        /* الفوتر */
+        footer {
+            background-color: #352872;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        /* النافذة المنبثقة (المودال) */
+        .modal-content {
+            direction: rtl;
+            border-radius: 10px;
+        }
+
+        .modal-header {
+            background-color: #352872;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .modal-footer {
+            background-color: #f4f7f6;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .back-home-btn:hover {
+            background-color: #5e55bc;
+        }
+
+        .back-home-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #352872;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            text-align: center;
+            position: fixed;
+            bottom: 70px;
+            left: 40px;
+            cursor: pointer;
+            z-index: 900; /* 🔹 أقل من الـ sidebar حتى لا يظهر فوقها */
+        }
+        .wethaq-logo {
+    position: absolute;
+    top: -7px;
+    right: 20px;
+    height: 90px;
+    width: auto;
+    transition: transform 0.3s ease;
+}
+
+.wethaq-logo:hover {
+    transform: scale(1.1);
+}
+
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <header>
+        عرض الملفات
+        <button class="menu-toggle" title="فتح القائمة الجانبية" id="toggleSidebar">☰</button>
+           <!-- شعار وثاق -->
+       <a href= "{% url 'center_dashboard' %}">
+        <img src="{% static 'images/WethaqLogo.png' %}" class="wethaq-logo" alt="شعار وثاق">
+    </a>
+    </header>
+
+    <!-- القائمة الجانبية -->
+    <div class="offcanvas" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">القائمة الجانبية</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <a href="{% url 'center_dashboard' %}">الصفحة الرئيسية</a>
+            <a href="{% url 'add_new_detainess' %}">إضافة موقوف جديد</a>
+            <a href="{% url 'view_all_files' %}">عرض الملفات</a>
+            <a href="{% url 'search_center_files' %}">بحث الملفات</a>
+            <a href="{% url 'add_new_case' %}">اضافة قضية جديدة</a>
+        </div>
+    </div>
+
+    <div class="container mt-5 content">
+        <h2 class="text-center mb-4">قائمة الملفات</h2>
+        <div class="card shadow">
+            <div class="card-body">
+                <table class="table table-striped" id="casesTable">
+                    <thead>
+                        <tr>
+                            <th>الاسم</th>
+                            <th>رقم الهوية</th>
+                            <th>حالة القضية</th>
+                            <th>تفاصيل</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- البيانات ستعرض هنا -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة منبثقة للتفاصيل -->
+    <div class="modal fade" id="fileDetailsModal" tabindex="-1" aria-labelledby="fileDetailsModalLabel">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="fileDetailsModalLabel">تفاصيل الملف</h5>
+
+                </div>
+                <div class="modal-body" id="modalDetails">
+                    <!-- التفاصيل ستعرض هنا -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <a href="{% url 'center_dashboard' %}" class="back-home-btn">⬅</a>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const toggleSidebar = document.getElementById('toggleSidebar');
+            const sidebar = new bootstrap.Offcanvas(document.getElementById('sidebar'));
+
+            toggleSidebar.addEventListener('click', () => {
+                sidebar.toggle();
+            });
+        });
+
+        // دالة لتحويل حالة القضية
+        function formatStatus(status) {
+            const statusMapping = {
+                "detained": "موقوف",
+                "under_review": "قيد المراجعة",
+                "sentenced": "صدر الحكم",
+                "imprisoned": "في السجن",
+                "released": "مفرج عنه",
+                "unknown": "غير معروف"
+            };
+            return statusMapping[status] || "غير معروف";
+        }
+
+        // دالة لتحويل نوع الهوية إلى العربية
+        const idTypeMap = {
+    'civil_registry': 'السجل المدني',
+    'resident_id': 'هوية مقيم',
+    'violator_refugee_id': 'هوية مخالف لاجئ',
+    'replacement_card': 'بطاقة بديلة'
+};
+
+        // جلب البيانات وعرضها في الجدول
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                console.error("التوكن غير موجود، تأكد من تسجيل الدخول");
+                return;
+            }
+
+            fetch('https://wethaq-backend.vercel.app/api/cases/', {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Token ${token}`
+                    }
+                })
+                .then(response => response.ok ? response.json() : Promise.reject('فشل في جلب البيانات'))
+                .then(data => {
+                    if (!Array.isArray(data)) {
+                        console.error("البيانات غير صالحة");
+                        return;
+                    }
+
+                    const casesTableBody = document.querySelector('#casesTable tbody');
+                    casesTableBody.innerHTML = '';
+
+                    data.forEach(caseItem => {
+                        const caseStatus = formatStatus(caseItem.detainee_status || "unknown");
+
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                        <td>${caseItem.detainee.name}</td>
+                        <td>${caseItem.detainee.id_number}</td>
+                        <td>${caseStatus}</td>
+                        <td><button class="btn btn-primary btn-sm" onclick="showFileDetails(${caseItem.id})">عرض</button></td>
+                    `;
+                        casesTableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('خطأ أثناء جلب القضايا:', error));
+        });
+
+        function showFileDetails(caseId) {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                console.error("التوكن غير موجود، تأكد من تسجيل الدخول");
+                return;
+            }
+
+            fetch(`https://wethaq-backend.vercel.app/api/cases/${caseId}/`, {
+                    method: 'GET',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Token ${token}`
+                    }
+                })
+                .then(response => response.ok ? response.json() : Promise.reject('فشل في جلب تفاصيل القضية'))
+                .then(data => {
+                    const modalBody = document.querySelector('#fileDetailsModal .modal-body');
+                    modalBody.innerHTML = `
+                    <p><strong>رقم القضية:</strong> ${data.case_number}</p>
+                    <p><strong>اسم الموقوف:</strong> ${data.detainee.name}</p>
+                    <p><strong>رقم الهوية:</strong> ${data.detainee.id_number}</p>
+                    <p><strong>الجنسية:</strong> ${data.detainee.nationality}</p>
+                    <p><strong>نوع الهوية:</strong> ${idTypeMap[data.detainee.id_type] || 'غير معروف'}</p>
+                    <p><strong>تاريخ الميلاد:</strong> ${data.detainee.date_of_birth}</p>
+                    <p><strong>العنوان:</strong> ${data.detainee.address}</p>
+                    <p><strong>التهمة:</strong> ${data.charge}</p>
+                    <p><strong>جهة القبض:</strong> ${data.arresting_authority}</p>
+                    <p><strong>مكان القبض:</strong> ${data.arresting_place}</p>
+                    <p><strong>تاريخ القبض:</strong> ${data.arresting_date}</p>
+                    <p><strong>جهة التوقيف:</strong> ${data.detention_agency}</p>
+                    <p><strong>حالة القضية:</strong> ${formatStatus(data.detainee_status || "unknown")}</p>
+                `;
+
+                    const modalElement = document.getElementById('fileDetailsModal');
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                })
+                .catch(error => console.error('خطأ أثناء جلب تفاصيل القضية:', error));
+        }
+    </script>
+
+</body>
+
+</html>
