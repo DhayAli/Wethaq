@@ -19,7 +19,7 @@ Smart Search & Dynamic Views: Enables staff to perform quick searches, filter re
 Automated Notifications & Updates: Triggers real-time alerts regarding status changes (e.g., case closures or scheduled release dates).
 
 Technology Stack:
-Backend: Python / Django   Frontend: HTML5, CSS3, JavaScript, Bootstrap   Database: SQLiteDesign & Prototyping: Figma   Architecture:Architecture: Django MVT pattern
+Backend: Python / Django   Frontend: HTML5, CSS3, JavaScript, Bootstrap   Database: SQLiteDesign & Prototyping: Figma   Architecture: Django MVT pattern
 
 Team Members & Supervision
 Project Team: Dhay Alqurshy, Jana Medher, Nrdeen Sahrah, Sara Alfaifi
