@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+        <title>Filter Files by Status</title>
+</head>
+
+<body>
+        <h1>Filter Files by Status</h1>
+        <form method="GET" action="">
+                <label for="case_status">Case Status:</label>
+                <select id="case_status" name="case_status">
+                        <option value="under_investigation">Under Investigation</option>
+                        <option value="in_court">In Court</option>
+                        <option value="judgment_issued">Judgment Issued</option>
+                        <option value="case_closed">Case Closed</option>
+                    </select>
+                <br><br>
+                <label for="detainee_status">Detainee Status:</label>
+                <select id="detainee_status" name="detainee_status">
+                        <option value="detainee">Detainee</option>
+                        <option value="convicted">Convicted</option>
+                        <option value="violating_residency">Violating Residency Regulations</option>
+                        <option value="released">Released</option>
+                        <option value="processing">Processing</option>
+                    </select>
+                <br><br>
+                <button type="submit">Filter</button>
+            </form>
+</body>
+
+</html>

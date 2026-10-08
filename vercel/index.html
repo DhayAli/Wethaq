@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="form">
+        <label for="stats">حالة القضية</label>
+        <select name="status" id="">
+            <option value="under_investigation" >قيد التحقيق</option>
+            <option value="in_court">في القضاء</option>
+            <option value="judgment_issued">تم الحكم</option>
+            <option value="in_prison">في السجن</option>
+            <option value="released">اخلاء</option>
+        </select>
+        <button>submit</button>
+    </form>
+</body>
+<script>
+    const form = document.getElementById("form")
+    form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const formData = new FormData(form);
+        const formProps = Object.fromEntries(formData);
+        console.log(formData)
+        console.log(formProps)
+    })
+</script>
+</html>

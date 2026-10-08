@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البحث داخل مركز</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+        }
+
+        header {
+            background-color: #4d6a5e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .content {
+            margin-top: 100px;
+            padding: 20px;
+        }
+
+        .search-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container select {
+            width: 30%;
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            margin: 5px;
+        }
+
+        .search-container input[type="text"] {
+            width: 50%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 5px;
+            outline: none;
+        }
+
+        .search-container button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #4d6a5e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #3b5447;
+        }
+
+        .results-container {
+            margin-top: 20px;
+            direction: rtl;
+        }
+
+        .result-header {
+            display: grid;
+            grid-template-columns: 1fr 3fr 2fr 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background-color: #4d6a5e;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .result-item {
+            display: grid;
+            grid-template-columns: 1fr 3fr 2fr 1fr;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-item:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .result-item div {
+            text-align: right;
+        }
+
+        .result-actions button {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            background-color: #4d6a5e;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .result-actions button:hover {
+            background-color: #3b5447;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            text-align: right;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup h3 {
+            margin-top: 0;
+        }
+
+        .popup button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4d6a5e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: #3b5447;
+        }
+
+        footer {
+            background-color: #4d6a5e;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+            z-index: 1000;
+        }
+
+        .back-home-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #4d6a5e;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            position: fixed;
+            bottom: 70px;
+            left: 40px;
+        }
+
+        .back-home-btn:hover {
+            background-color: #3b5447;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        البحث داخل مركز
+    </header>
+
+    <div class="content">
+        <div class="search-container">
+            <select id="centerSelect">
+                <option value="">اختر المركز</option>
+                <option value="police">مركز الشرطة</option>
+                <option value="prison">مركز السجن</option>
+                <option value="care">مركز الرعاية</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="اكتب كلمة البحث هنا..." onkeypress="handleKeyPress(event)">
+            <button onclick="performSearch()">بحث</button>
+        </div>
+
+        <div class="results-container" id="resultsContainer">
+            <div class="result-header">
+                <div>رقم الملف</div>
+                <div>اسم السجين</div>
+                <div>الحالة</div>
+                <div>الإجراءات</div>
+            </div>
+        </div>
+
+        <div class="popup-overlay" id="popupOverlay" onclick="closePopup(event)">
+            <div class="popup" onclick="event.stopPropagation()">
+                <h3>تفاصيل السجين</h3>
+                <p><strong>رقم الهوية:</strong> 123456789</p>
+                <p><strong>الاسم الثلاثي:</strong> محمد أحمد علي</p>
+                <p><strong>نوع الهوية:</strong> هوية وطنية</p>
+                <p><strong>الجنسية:</strong> سعودي</p>
+                <p><strong>تاريخ الميلاد:</strong> 1-1-1990</p>
+                <p><strong>التهمة:</strong> سرقة</p>
+                <p><strong>المركز:</strong> مركز الشرطة</p>
+                <p><strong>تاريخ القبض:</strong> 12-12-2023</p>
+                <p><strong>العنوان:</strong> الرياض</p>
+                <p><strong>رقم الجوال:</strong> 0501234567</p>
+                <button onclick="closePopup()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <a href="{% url 'observer_dashboard' %}" class="back-home-btn">⬅</a>
+
+    <footer>
+        جميع الحقوق محفوظة © وثاق 2024
+    </footer>
+
+    <script>
+        function performSearch() {
+            const center = document.getElementById("centerSelect").value;
+            const searchInput = document.getElementById("searchInput").value.trim();
+            const resultsContainer = document.getElementById("resultsContainer");
+
+            resultsContainer.innerHTML = `
+                <div class="result-header">
+                    <div>رقم الملف</div>
+                    <div>اسم السجين</div>
+                    <div>الحالة</div>
+                    <div>الإجراءات</div>
+                </div>`;
+
+            if (!center) {
+                resultsContainer.innerHTML += "<div>يرجى اختيار مركز.</div>";
+                return;
+            }
+
+            const data = [
+                { id: 1, fileNumber: "001", detaineeName: "محمد", status: "فعال", center: "police" },
+                { id: 2, fileNumber: "002", detaineeName: "أحمد", status: "منتهي", center: "prison" },
+                { id: 3, fileNumber: "003", detaineeName: "خالد", status: "قيد المراجعة", center: "care" }
+            ];
+
+            const results = data.filter(item =>
+                item.center === center &&
+                (item.fileNumber.includes(searchInput) || item.detaineeName.includes(searchInput) || item.status.includes(searchInput))
+            );
+
+            if (results.length > 0) {
+                results.forEach(result => {
+                    const resultItem = document.createElement("div");
+                    resultItem.className = "result-item";
+                    resultItem.innerHTML = `
+                        <div>${result.fileNumber}</div>
+                        <div>${result.detaineeName}</div>
+                        <div>${result.status}</div>
+                        <div class="result-actions"><button onclick="showPopup()">عرض</button></div>
+                    `;
+                    resultsContainer.appendChild(resultItem);
+                });
+            } else {
+                resultsContainer.innerHTML += "<div>لا توجد نتائج مطابقة.</div>";
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                performSearch();
+            }
+        }
+
+        function showPopup() {
+            document.getElementById("popupOverlay").style.display = "flex";
+        }
+
+        function closePopup(event) {
+            document.getElementById("popupOverlay").style.display = "none";
+        }
+    </script>
+</body>
+
+</html>

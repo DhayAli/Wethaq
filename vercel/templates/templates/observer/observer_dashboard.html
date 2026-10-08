@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - المراقب</title>
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+        }
+
+        header {
+            background-color: #4d6a5e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .content {
+            margin-top: 80px;
+            padding: 20px;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: #4d6a5e;
+            color: white;
+            height: 100%;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            overflow: hidden;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: white;
+            font-size: 1rem;
+            border-bottom: 1px solid #3b5447;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: #3b5447;
+        }
+
+        .menu-toggle {
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background-color: #4d6a5e;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+
+        /* Stats Section */
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            margin: 0 10px;
+        }
+
+        .stat-box h3 {
+            margin: 0;
+            font-size: 2.5rem;
+            color: #4d6a5e;
+        }
+
+        .stat-box p {
+            margin: 5px 0 0;
+            font-size: 1rem;
+            color: #777;
+        }
+
+        footer {
+            background-color: #4d6a5e;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+            .notification-icon {
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-left: 15px;
+            color: white;
+            background-color: #4d6a5e;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .notification-icon:hover {
+            background-color: #3b5447;
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <header>
+        لوحة التحكم - المراقب
+        <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+        <button class="notification-icon" onclick="openNotifications()">🔔</button>
+
+    </header>
+
+    <div class="sidebar" id="sidebar">
+        <a href="/observer/general-search/">البحث العام</a>
+        <a href="/observer/search-within-center/">البحث داخل مركز</a>
+        <a href="/observer/notifications/">التنبيهات</a>
+        <a href="/observer/filter-files-by-status/">تصفية الملفات</a>
+        <a href="/observer/view-previous-records/">السجلات السابقة</a>
+    </div>
+
+    <div class="content">
+        <div class="stats-container">
+            <div class="stat-box">
+                <h3>120</h3>
+                <p>الملفات</p>
+            </div>
+            <div class="stat-box">
+                <h3>30</h3>
+                <p>ملفات تحت التحقيق</p>
+            </div>
+            <div class="stat-box">
+                <h3>10</h3>
+                <p>ملفات مغلقة</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        جميع الحقوق محفوظة © وثاق 2024
+    </footer>
+
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول</title>
+    <style>
+        /* تنسيقات عامة */
+        body {
+            margin: 0;
+            background-color: #edf3f5;
+            /* لون الخلفية */
+            font-family: Arial, sans-serif;
+        }
+
+        /* تنسيق الناف بار */
+        .navbar {
+            background-color: #8B5E34;
+            /* لون الناف بار */
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            color: white;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #734a2a;
+            /* لون عند تمرير المؤشر */
+        }
+
+        /* تنسيق محتوى الصفحة */
+        .container {
+            width: 400px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin: 50px auto;
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 95%;
+            padding: 10px;
+            background-color: #8B5E34;
+            /* لون الزر */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #734a2a;
+            /* لون عند تمرير المؤشر */
+        }
+    </style>
+</head>
+
+<body>
+    <!-- الناف بار -->
+    <div class="navbar">
+        <a href="{% url 'observer_dashboard' %}">لوحة تحكم المراقب</a>
+        <a href="{% url 'center_dashboard' %}">لوحة تحكم المراكز</a>
+        <a href="{% url 'prison_dashboard' %}">لوحة تحكم السجن</a>
+    </div>
+
+    <!-- محتوى الصفحة -->
+    <div class="container">
+        <h2>تسجيل الدخول</h2>
+        <p>مرحبًا بك في وثاق، الرجاء تسجيل الدخول للمتابعة.</p>
+        <form action="#" method="post">
+            <input type="email" placeholder="البريد الإلكتروني" required><br>
+            <input type="password" placeholder="كلمة المرور" required><br>
+            <button type="submit">تسجيل الدخول</button>
+        </form>
+    </div>
+</body>
+
+</html>

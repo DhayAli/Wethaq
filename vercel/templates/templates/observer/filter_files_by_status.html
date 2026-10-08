@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تصفية الملفات حسب الحالة</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+        }
+
+        header {
+            background-color: #4d6a5e;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: bold;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .content {
+            margin-top: 100px;
+            padding: 20px;
+        }
+
+        .filter-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .filter-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-form label {
+            font-size: 1rem;
+            margin-right: 5px;
+        }
+
+        .filter-form select {
+            width: 200px;
+            padding: 8px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        .filter-container button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: #4d6a5e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .filter-container button:hover {
+            background-color: #3b5447;
+        }
+
+        .results-container {
+            margin-top: 20px;
+            direction: rtl;
+            text-align: center;
+        }
+
+        .result-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr 2fr 2fr;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background-color: #4d6a5e;
+            color: white;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .result-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr 2fr 2fr;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-item:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .result-item button {
+            padding: 5px 10px;
+            font-size: 0.9rem;
+            background-color: #4d6a5e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .result-item button:hover {
+            background-color: #3b5447;
+        }
+
+        footer {
+            background-color: #4d6a5e;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+
+        .back-home-btn {
+            display: inline-block;
+            padding: 8px 15px;
+            background-color: #4d6a5e;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            position: fixed;
+            bottom: 70px;
+            left: 40px;
+        }
+
+        .back-home-btn:hover {
+            background-color: #3b5447;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .popup {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            text-align: right;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .popup h3 {
+            margin-top: 0;
+        }
+
+        .popup button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4d6a5e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .popup button:hover {
+            background-color: #3b5447;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        تصفية الملفات حسب الحالة
+    </header>
+
+    <div class="content">
+        <!-- Filter Box -->
+        <div class="filter-container">
+            <form method="GET" action="" class="filter-form" onsubmit="filterResults(event)">
+                <label for="case_status">حالة القضية:</label>
+                <select id="case_status" name="case_status">
+                    <option value="">اختر الحالة</option>
+                    <option value="تحت التحقيق">تحت التحقيق</option>
+                    <option value="في المحكمة">في المحكمة</option>
+                    <option value="حكم صادر">حكم صادر</option>
+                    <option value="القضية مغلقة">القضية مغلقة</option>
+                </select>
+
+                <label for="detainee_status">حالة السجين:</label>
+                <select id="detainee_status" name="detainee_status">
+                    <option value="">اختر الحالة</option>
+                    <option value="موقوف">موقوف</option>
+                    <option value="محكوم">محكوم</option>
+                    <option value="مخالف لنظام الإقامة">مخالف لنظام الإقامة</option>
+                    <option value="تم الإفراج عنه">تم الإفراج عنه</option>
+                    <option value="قيد المعالجة">قيد المعالجة</option>
+                </select>
+
+                <button type="submit">تصفية</button>
+            </form>
+        </div>
+
+        <!-- Back to Home Button -->
+        <div style="text-align: center;">
+            <a href="{% url 'observer_dashboard' %}" class="back-home-btn">⬅</a>
+        </div>
+
+        <!-- Results Section -->
+        <div class="results-container" id="resultsContainer">
+            <div class="result-header">
+                <div>رقم الملف</div>
+                <div>اسم السجين</div>
+                <div>حالة القضية</div>
+                <div>حالة السجين</div>
+                <div>الإجراءات</div>
+            </div>
+        </div>
+
+        <!-- Popup -->
+        <div class="popup-overlay" id="popupOverlay" onclick="closePopup(event)">
+            <div class="popup" onclick="event.stopPropagation()">
+                <h3>تفاصيل السجين</h3>
+                <p><strong>رقم الملف:</strong> <span id="popupFileNumber"></span></p>
+                <p><strong>اسم السجين:</strong> <span id="popupName"></span></p>
+                <p><strong>حالة القضية:</strong> <span id="popupCaseStatus"></span></p>
+                <p><strong>حالة السجين:</strong> <span id="popupDetaineeStatus"></span></p>
+                <button onclick="closePopup()">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        جميع الحقوق محفوظة © وثاق 2024
+    </footer>
+
+    <script>
+        const data = [
+            { id: 1, fileNumber: "001", detaineeName: "محمد أحمد", caseStatus: "تحت التحقيق", detaineeStatus: "موقوف" },
+            { id: 2, fileNumber: "002", detaineeName: "أحمد علي", caseStatus: "في المحكمة", detaineeStatus: "محكوم" },
+            { id: 3, fileNumber: "003", detaineeName: "خالد سعيد", caseStatus: "حكم صادر", detaineeStatus: "تم الإفراج عنه" },
+            { id: 4, fileNumber: "004", detaineeName: "عمر حسن", caseStatus: "القضية مغلقة", detaineeStatus: "قيد المعالجة" },
+            { id: 5, fileNumber: "005", detaineeName: "يوسف إبراهيم", caseStatus: "تحت التحقيق", detaineeStatus: "مخالف لنظام الإقامة" }
+        ];
+
+        function filterResults(event) {
+            event.preventDefault();
+
+            const caseStatus = document.getElementById("case_status").value;
+            const detaineeStatus = document.getElementById("detainee_status").value;
+            const resultsContainer = document.getElementById("resultsContainer");
+
+            resultsContainer.innerHTML = `
+                <div class="result-header">
+                    <div>رقم الملف</div>
+                    <div>اسم السجين</div>
+                    <div>حالة القضية</div>
+                    <div>حالة السجين</div>
+                    <div>الإجراءات</div>
+                </div>`;
+
+            const filteredData = data.filter(item => {
+                return (
+                    (caseStatus === "" || item.caseStatus === caseStatus) &&
+                    (detaineeStatus === "" || item.detaineeStatus === detaineeStatus)
+                );
+            });
+
+            if (filteredData.length > 0) {
+                filteredData.forEach(item => {
+                    const resultItem = document.createElement("div");
+                    resultItem.className = "result-item";
+                    resultItem.innerHTML = `
+                        <div>${item.fileNumber}</div>
+                        <div>${item.detaineeName}</div>
+                        <div>${item.caseStatus}</div>
+                        <div>${item.detaineeStatus}</div>
+                        <div><button onclick="showPopup(${item.id})">عرض</button></div>
+                    `;
+                    resultsContainer.appendChild(resultItem);
+                });
+            } else {
+                resultsContainer.innerHTML += "<div>لا توجد نتائج مطابقة.</div>";
+            }
+        }
+
+        function showPopup(id) {
+            const selectedData = data.find(item => item.id === id);
+            if (selectedData) {
+                document.getElementById("popupFileNumber").textContent = selectedData.fileNumber;
+                document.getElementById("popupName").textContent = selectedData.detaineeName;
+                document.getElementById("popupCaseStatus").textContent = selectedData.caseStatus;
+                document.getElementById("popupDetaineeStatus").textContent = selectedData.detaineeStatus;
+                document.getElementById("popupOverlay").style.display = "flex";
+            }
+        }
+
+        function closePopup(event) {
+            document.getElementById("popupOverlay").style.display = "none";
+        }
+    </script>
+</body>
+
+</html>
